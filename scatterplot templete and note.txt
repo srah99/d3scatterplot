@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  //  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+  <h1>Covid Data Source Scatter Plot(in D3)</h1>
+    <script type='text/javascript' src='script.js'></script>
+  </body>
+</html>
+============script.js
+//import{extent} from d3 not working properly
+d3.csv("https://raw.githubusercontent.com/srah99/covidData/main/CovidData%20(1).csv", function (data) {
+  // Variables
+  var body = d3.select('body')
+	var margin = { top: 20, right: 30, bottom: 50, left: 50 }
+	var h = 700 - margin.top - margin.bottom
+	var w = 1800 - margin.left - margin.right
+	
+	// Scales
+ var colorScale = d3.scale.category20b()
+// var colorScale = d3.scaleSequential().domain([1,10])
+ // .interpolator(d3.interpolatePuRd);
+ //svg.selectAll(".firstcolumn").data(data).enter().append("circle").attr("cx", function(d,i){return 30 + i*60}).attr("cy", 150).attr("r", 19).attr("fill", function(d){return myColor(d) })
+
+  var xScale = d3.scale.linear()
+    .domain([
+    	d3.min([0,d3.min(data,function (d) { return d.cases })]),
+    	d3.max([0,d3.max(data,function (d) { return d.cases })])
+    	])
+    .range([0,w])
+    //.padding(10) padding did not work properly padding the line circles off of the xaxis
+  var yScale = d3.scale.linear()
+    .domain([
+    	d3.min([0,d3.min(data,function (d) { return d.deaths })]),
+    	d3.max([0,d3.max(data,function (d) { return d.deaths })])
+    	])
+    .range([h,0])
+	// SVG
+	var svg = body.append('svg')
+	    .attr('height',h + margin.top + margin.bottom)
+	    .attr('width',w + margin.left + margin.right)
+	  .append('g')
+	    .attr('transform','translate(' + margin.left + ',' + margin.top + ')')
+	// X-axis
+	var xAxis = d3.svg.axis()
+	  .scale(xScale)
+	  .ticks(20)
+	  .orient('bottom')
+  // Y-axis
+	var yAxis = d3.svg.axis()
+	  .scale(yScale)
+	  .ticks(20)
+	  .orient('left')
+
+  // Circles
+  var circles = svg.selectAll('circle')
+      .data(data)
+      .enter()
+    .append('circle')
+      .attr('cx',function (d) { return xScale(d.cases) })
+      .attr('cy',function (d) { return yScale(d.deaths) })
+      .attr('r','2')
+      .attr('stroke','lavender')
+      .attr('stroke-width',.5)
+     // if (column[0]=='date')
+      .attr('fill',function (d,i) { return colorScale(i) })
+      .on('mouseover', function () {
+        d3.select(this)
+          .transition()
+          .duration(500)
+          .attr('r',20)
+          .attr('stroke-width',1)
+      })
+      .on('mouseout', function () {
+        d3.select(this)
+          .transition()
+          .duration(500)
+          .attr('r',10)
+          .attr('stroke-width',1)
+      })
+    .append('title') // Tooltip
+      .text(function (d) { return "" +
+                            '\nCounty: ' + d.county +
+                            '\nState: ' + d.state +
+                           '\nCases: ' + d.cases +
+                           '\nDeaths: ' + d.deaths })
+  // X-axis
+  svg.append('g')
+      .attr('class','axis')
+      .attr('transform', 'translate(0,' + h + ')')
+      .call(xAxis)
+    .append('text') // X-axis Label
+      .attr('class','label')
+      .attr('y',+20)
+      .attr('x',w/2)
+      .attr('dy','.71em')
+      .style('text-anchor','bottom')
+      .text('Cases')
+  // Y-axis
+  svg.append('g')
+      .attr('class', 'axis')
+      .call(yAxis)
+    .append('text') // y-axis Label
+      .attr('class','label')
+      .attr('transform','rotate(-90)')
+      .attr('x',-375)
+      .attr('y',-50)
+
+      .attr('dy','.71em')
+      .style('text-anchor','left')
+      .text('Deaths')
+})
+========style.css
+.axis path,
+.axis line {
+  fill: none;
+	stroke: rgb(106, 39, 157);
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 10px;
+}
+=========grouped d3 scatterplot graph
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+//Read the data
+d3.csv("https://raw.githubusercontent.com/srah99/covidData/main/CovidData%20(1).csv", function(data) {
+
+  // Add X axis
+  var x = d3.scaleLinear()
+    .domain([0, 12000])
+    .range([ 0, width ]);
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // Add Y axis
+  var y = d3.scaleLinear()
+    .domain([0, 600])
+    .range([ height, 0]);
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  // Color scale: give me a date, I return a color
+  var color = d3.scaleOrdinal()
+    .domain(["7/10/2022", "7/24/2022","8/7/2022", "8/21/2022" ])
+    .range([ "#C2FFA3", "#B36DCB", "#B1BE25","#CB6DB6",]
+  // Add dots
+  svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return x(d.cases); } )
+      .attr("cy", function (d) { return y(d.deaths); } )
+      .attr("r", .5)
+      .style("fill", function (d) { return color(d.cases + d.deaths) } )
+
+})
+
+</script>
+=====to install d3 use : npm install d3
+all apis
+<script src = "https://d3js.org/d3-array.v1.min.js"></script>
+<script src = "https://d3js.org/d3-collection.v1.min.js"></script>
+<script src = "https://d3js.org/d3-color.v1.min.js"></script>
+<script src = "https://d3js.org/d3-format.v1.min.js"></script>
+<script src = "https://d3js.org/d3-interpolate.v1.min.js"></script>
+<script src = "https://d3js.org/d3-time.v1.min.js"></script>
+<script src = "https://d3js.org/d3-time-format.v2.min.js"></script>
+<script src = "https://d3js.org/d3-scale.v1.min.js"></script>
+
+https://www.tutorialspoint.com/d3js/d3js_data_join.htm
+
+https://www.w3schools.com/js/js_intro.asp
+GREAT^^ learing, refresher material

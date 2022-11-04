@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "d3scatterplot",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.port": 5502
+	}
+}

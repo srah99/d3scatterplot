@@ -1,2 +1,3 @@
 # d3scatterplot
-D3 scatterplot colors based on dates
+D3 scatterplot colors based on dates:
+This is a simple workshop assignment to create a D3 scatter chart. What I ran into after I downloaded D3 and installed to my folder is that the web page did not show up the chart I made. I then started testing the IDE, and found the "live" D3 scatter plot on D3's website worked but their code did not work for me with the D3 installed. So then I made sure that I had all the Api's and libraries installed to my knowledge. I then reasearched more, I got a code snippet to work that had previous libraries with the D3. Then I used a testing method to create a new front end. I tested for functionality almost 20 different snippets to make it work. Definately an api problem or library bug that prevented the colors from showing and the backend of the code from functional perfection. If anyone knows how to fix feel free. Leave me a note and tell me what you found! thanks Srah99
